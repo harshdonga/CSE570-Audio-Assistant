@@ -1,0 +1,18 @@
+# Exclude Python cache files and directories
+__pycache__/
+
+# Exclude audio directory
+audio/
+
+# models
+models/
+
+# Exclude pycache from denoiser & query_engine
+src/denoiser/__pycache__
+src/query_engine/__pycache__
+
+# Exclude noise directory
+src/denoiser/noise/
+
+# Secret keys
+.env
