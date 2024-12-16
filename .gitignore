@@ -1,9 +1,6 @@
 # Exclude Python cache files and directories
 __pycache__/
 
-# Exclude audio directory
-audio/
-
 # models
 models/
 

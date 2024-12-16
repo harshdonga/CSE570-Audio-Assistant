@@ -59,6 +59,7 @@ Follow the prompts in the CLI for further interactions.
 ## Additional Notes
 - **Models**: Models will be saved and read from `models/` directories by default. Ensure these directories exist or modify the script to create them dynamically.
 - **Features**: Features & Labels are read from `X/`  & `y/` directories respectively by default, so make sure helper script saves them accordingly
+- **Examples**: Some examples of sample and cleaned audio can be found in `audio/` directory 
 
 ## Acknowledgments
 - Dataset: [FSD50K](https://zenodo.org/records/4060432).
