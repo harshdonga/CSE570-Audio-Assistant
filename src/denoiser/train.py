@@ -5,6 +5,7 @@ from keras.models import Model
 from keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten, Dropout, BatchNormalization
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import KFold
+MODEL_PATH = "./models/"
 
 # Define the distillation loss
 def distillation_loss(y_true, y_pred_student, y_pred_teacher, alpha=0.7, temperature=3):
@@ -44,8 +45,8 @@ def create_student_model(input_shape, num_classes):
 
 def train_model_with_cmkd(seed, alpha=0.7, temperature=3):
     # Load preprocessed data
-    X = np.load(f'X{seed}.npy')
-    y = np.load(f'y{seed}.npy')
+    X = np.load(f'./X/X{seed}.npy')
+    y = np.load(f'./y/y{seed}.npy')
 
     kf = KFold(n_splits=10, shuffle=True, random_state=42)
     fold_no = 1
@@ -68,7 +69,7 @@ def train_model_with_cmkd(seed, alpha=0.7, temperature=3):
 
         teacher_callbacks = [
             EarlyStopping(patience=5, restore_best_weights=True),
-            ModelCheckpoint(f'teacher_fold_{fold_no}.keras', save_best_only=True)
+            ModelCheckpoint(f'{MODEL_PATH}teacher_fold_{fold_no}.keras', save_best_only=True)
         ]
 
         teacher_model.fit(X_train, y_train_cat,
@@ -80,7 +81,7 @@ def train_model_with_cmkd(seed, alpha=0.7, temperature=3):
         teacher_accuracies.append(teacher_scores[1] * 100)
 
         # Load best teacher model
-        teacher_model = keras.saving.load_model(f'teacher_fold_{fold_no}.keras')
+        teacher_model = keras.saving.load_model(f'{MODEL_PATH}teacher_fold_{fold_no}.keras')
 
         # Train student model
         student_model = create_student_model(input_shape, 200)
@@ -102,7 +103,7 @@ def train_model_with_cmkd(seed, alpha=0.7, temperature=3):
             val_loss, val_acc = student_model.evaluate(X_val, y_val_cat, verbose=0)
 
         # Save student model
-        keras.saving.save_model(student_model, f'student_fold_{fold_no}.keras')
+        keras.saving.save_model(student_model, f'{MODEL_PATH}student_fold_{fold_no}.keras')
 
         student_scores = student_model.evaluate(X_val, y_val_cat, verbose=0)
         student_accuracies.append(student_scores[1] * 100)
@@ -113,7 +114,7 @@ def train_model_with_cmkd(seed, alpha=0.7, temperature=3):
     best_student_accuracy = max(student_accuracies)
     best_fold = student_accuracies.index(best_student_accuracy) + 1
     best_student_model = create_student_model(input_shape, 200)
-    best_student_model = keras.saving.load_model(f'student_fold_{best_fold}.keras')
-    keras.saving.save_model(best_student_model, 'best_model.keras')
+    best_student_model = keras.saving.load_model(f'{MODEL_PATH}student_fold_{best_fold}.keras')
+    keras.saving.save_model(best_student_model, MODEL_PATH+ 'best_model.keras')
 
     return best_student_model
